@@ -60,10 +60,11 @@ The **Cell-Averaging Constant False Alarm Rate (CA-CFAR)** algorithm is applied 
 The algorithm iterates through the RDM, defining an adaptive detection threshold ($T_h$) for each Cell Under Test ($\text{CUT}$) based on the local noise power ($\hat{P}_n$) estimated from the surrounding Training Cells. 
 1.  **Noise Estimation:** The power of the Training Cells within the window is summed in the **linear** domain ($\text{db2pow}$).
 2.  **Exclusion:** The Guard Cells and CUT are explicitly set to zero power in the **linear** domain to prevent signal leakage from corrupting the noise average.
-3.  **Threshold Calculation:** The average linear noise power is converted back to $\text{dB}$ ($\text{pow2db}$), and the $\text{offset}$ is added:
-    $$
-    T_h = \text{pow2db} \left( \frac{\sum P_{\text{linear}}}{\text{Total Training Cells}} \right) + \text{offset}_{\text{dB}}
-    $$
+3.  **Threshold Calculation:** The average linear noise power is converted back to decibels (dB) using `pow2db`, and a fixed SNR offset is added to form the adaptive threshold:
+
+\[
+T_h = \text{pow2db}\left( \frac{\sum P_{\text{linear}}}{\text{Total Training Cells}} \right) + \text{offset}_{\text{dB}}
+\]
 4.  **Detection:** If the CUT power ($\text{RDM}_{\text{CUT}}$) is greater than $T_h$, the cell is marked as a target (`1`) in the output map ($\text{RDM}_{\text{cfar}}$).
 
 ---
