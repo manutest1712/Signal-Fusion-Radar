@@ -1,76 +1,144 @@
-# FMCW Radar Target Detection with 2D CFAR
+# FMCW Radar Target Detection with 2D CA-CFAR
 
-This repository contains a MATLAB script that simulates a 77 GHz Frequency Modulated Continuous Wave (FMCW) radar system to detect a single moving target. The core of the detection process involves generating a Range-Doppler Map (RDM) using a 2D Fast Fourier Transform (FFT) and applying the **2D Cell-Averaging Constant False Alarm Rate (CA-CFAR)** algorithm for robust automatic target detection.
+This repository contains a MATLAB script that simulates a **77 GHz Frequency Modulated Continuous Wave (FMCW) radar** system for detecting a single moving target. The detection pipeline includes **Range–Doppler Map (RDM) generation using a 2D Fast Fourier Transform (FFT)** and **automatic target detection using a 2D Cell-Averaging Constant False Alarm Rate (CA-CFAR)** algorithm.
+
+---
 
 ## ⚙️ Radar System Specifications
 
 | Parameter | Value |
-| :--- | :--- |
+|---------|------|
 | **Operating Frequency ($f_c$)** | 77 GHz |
 | **Maximum Range ($R_{max}$)** | 200 m |
 | **Range Resolution ($\Delta R$)** | 1 m |
 | **Maximum Velocity ($V_{max}$)** | 100 m/s |
 | **Speed of Light ($c$)** | $3 \times 10^8$ m/s |
 
+---
+
 ## 🎯 Target Configuration
 
-A single moving target is simulated with constant velocity throughout the observation period.
+A single point target is simulated with **constant radial velocity** throughout the observation period.
 
 | Parameter | Value |
-| :--- | :--- |
+|---------|------|
 | **Initial Range** | 110 m |
-| **Velocity** | -20 m/s (Approaching) |
+| **Radial Velocity** | −20 m/s (approaching the radar) |
 
-## 🛠️ Code Structure and Signal Processing Steps
+---
 
-The script is divided into four main sections:
+## 🛠️ Signal Processing Flow
 
-### 1. FMCW Waveform Generation
-The script first calculates the necessary FMCW parameters based on the specifications:
+The MATLAB script is divided into four main stages:
 
-* **Bandwidth ($B_{sweep}$):** Determined by the required Range Resolution. $B_{sweep} = \frac{c}{2 \cdot \Delta R} = 150 \text{ MHz}$.
-* **Chirp Time ($T_{chirp}$):** Calculated based on the maximum range to ensure the beat frequency falls within the processing window.
-* **Slope ($S$):** $S = B_{sweep} / T_{chirp}$.
+---
 
-### 2. Signal Generation and Moving Target Simulation
-This section generates the transmitted (`Tx`) and received (`Rx`) signals based on the target's instantaneous range and time delay, accounting for the Doppler shift. The beat signal (`Mix`) is calculated by multiplying the `Tx` and `Rx` signals.
+## 1️⃣ FMCW Waveform Generation
 
-### 3. Range Doppler Response
-The script uses the 2D FFT to generate the Range-Doppler Map (RDM).
+The FMCW waveform parameters are derived from the radar specifications:
 
-* **First FFT (Range FFT):** Applied along the columns ($\text{Nr}=1024$ samples per chirp) to separate beat frequencies, providing the target's range profile.
-* **Second FFT (Doppler FFT):** Applied along the rows ($\text{Nd}=128$ chirps) to separate the Doppler frequencies, providing the target's velocity.
-* The RDM is converted to a logarithmic scale ($\text{dB}$) using $10 \log_{10}(RDM)$ for CFAR processing. 
+- **Sweep Bandwidth ($B_{sweep}$)**  
+  Determined by the required range resolution:
+  \[
+  B_{sweep} = \frac{c}{2 \Delta R} = 150~\text{MHz}
+  \]
 
-### 4. 2D CA-CFAR Implementation
-The **Cell-Averaging Constant False Alarm Rate (CA-CFAR)** algorithm is applied to the RDM to automatically detect the target while maintaining a consistent false alarm rate against background noise and clutter.
+- **Chirp Duration ($T_{chirp}$)**  
+  Selected to satisfy the maximum unambiguous range condition:
+  \[
+  T_{chirp} = 5.5 \times \frac{2 R_{max}}{c}
+  \]
 
-#### CFAR Parameters:
+- **Chirp Slope ($S$)**  
+  \[
+  S = \frac{B_{sweep}}{T_{chirp}}
+  \]
+
+These parameters define the linear frequency modulation of the transmitted FMCW chirp.
+
+---
+
+## 2️⃣ Signal Generation and Moving Target Simulation
+
+For each time sample:
+
+- The target range is updated assuming constant velocity motion.
+- The round-trip propagation delay is computed from the instantaneous range.
+- Transmitted (**Tx**) and received (**Rx**) signals are generated using the FMCW phase model.
+- The **beat signal (Mix)** is formed by mixing Tx and Rx:
+  \[
+  \text{Mix}(t) = \text{Tx}(t) \cdot \text{Rx}(t)
+  \]
+
+The Doppler effect is naturally captured through the time-varying propagation delay of the received signal.
+
+---
+
+## 3️⃣ Range–Doppler Map (RDM) Generation
+
+The Range–Doppler Map is generated using a 2D FFT:
+
+- **Range FFT**  
+  Applied along the fast-time dimension ($N_r = 1024$ samples per chirp) to extract beat frequencies corresponding to target range.
+
+- **Doppler FFT**  
+  Applied along the slow-time dimension ($N_d = 128$ chirps) to estimate target radial velocity.
+
+- The resulting RDM is converted to logarithmic scale (dB):
+  \[
+  \text{RDM}_{\text{dB}} = 10 \log_{10}(|\text{RDM}|)
+  \]
+
+This RDM serves as the input to the CFAR detector.
+
+---
+
+## 4️⃣ 2D CA-CFAR Implementation
+
+A **Cell-Averaging Constant False Alarm Rate (CA-CFAR)** detector is applied to the RDM to identify targets while maintaining a constant false alarm probability.
+
+### CFAR Parameters
 
 | Parameter | Symbol | Value | Description |
-| :--- | :--- | :--- | :--- |
-| **Range Training Cells (one side)** | $\text{Tr}$ | 10 | Used for noise estimation in the range dimension. |
-| **Doppler Training Cells (one side)** | $\text{Td}$ | 8 | Used for noise estimation in the Doppler dimension. |
-| **Range Guard Cells (one side)** | $\text{Gr}$ | 4 | Cells around the CUT that are excluded from noise estimation. |
-| **Doppler Guard Cells (one side)** | $\text{Gd}$ | 4 | Cells around the CUT that are excluded from noise estimation. |
-| **Threshold Offset ($\alpha$)** | $\text{offset}$ | 6 dB | The required Signal-to-Noise Ratio (SNR) margin for detection. |
+|---------|-------|-------|------------|
+| Range Training Cells (one side) | Tr | 10 | Noise estimation in range dimension |
+| Doppler Training Cells (one side) | Td | 8 | Noise estimation in Doppler dimension |
+| Range Guard Cells (one side) | Gr | 4 | Protect CUT from signal leakage |
+| Doppler Guard Cells (one side) | Gd | 4 | Protect CUT from signal leakage |
+| Threshold Offset | Offset | 6 dB | Required SNR margin |
 
-#### CFAR Core Logic:
+---
 
-The algorithm iterates through the RDM, defining an adaptive detection threshold ($T_h$) for each Cell Under Test ($\text{CUT}$) based on the local noise power ($\hat{P}_n$) estimated from the surrounding Training Cells.
+### CFAR Detection Logic
 
-1.  **Noise Estimation:** The power of the Training Cells within the window is summed in the **linear** domain ($\text{db2pow}$).
-2.  **Exclusion:** The Guard Cells and CUT are explicitly set to zero power in the **linear** domain to prevent signal leakage from corrupting the noise average.
-3.  **Threshold Calculation:** The average linear noise power is converted back to $\text{dB}$ ($\text{pow2db}$), and the $\text{offset}$ is added:
-    $$
-    T_h = \text{pow2db} \left( \frac{\sum P_{\text{linear}}}{\text{Total Training Cells}} \right) + \text{offset}_{\text{dB}}
-    $$
-4.  **Detection:** If the CUT power ($\text{RDM}_{\text{CUT}}$) is greater than $T_h$, the cell is marked as a target (`1`) in the output map ($\text{RDM\_cfar}$). 
+For each **Cell Under Test (CUT)**:
 
-## 📈 Expected Output
+1. A sliding window is formed around the CUT containing training and guard cells.
+2. Guard cells and the CUT are excluded from noise estimation.
+3. Training cell power is summed in the **linear domain** using `db2pow`.
+4. Average noise power is computed and converted back to dB:
+   \[
+   T_h = \text{pow2db}\left(\frac{\sum P_{\text{training}}}{N_{\text{training}}}\right) + \text{Offset}
+   \]
+5. If the CUT power exceeds the threshold, the cell is declared a detection.
 
-The script generates plots for:
+---
 
-1.  **Range from First FFT:** Shows the range profile of the first chirp, clearly indicating the target range.
-2.  **Range Doppler Map (RDM):** A 3D surface plot showing the target's power peak at its correct range and velocity coordinates.
-3.  **CFAR Detection Map:** A binary map ($\text{RDM\_cfar}$) where only the detected target cell(s) are set to 1, demonstrating the successful suppression of noise and clutter.
+## 📈 Output Visualizations
+
+The script generates the following plots:
+
+1. **Range FFT Output**  
+   Displays the range profile of the first chirp, clearly showing the target range.
+
+2. **Range–Doppler Map (RDM)**  
+   A 3D surface plot highlighting the target’s location in range and velocity.
+
+3. **CFAR Detection Map**  
+   A binary detection map where detected target cells are marked as `1`, demonstrating effective noise and clutter suppression.
+
+---
+
+## ✅ Summary
+
+This project demonstrates a complete FMCW radar signal processing chain, including waveform design, signal simulation, FFT-based range–Doppler processing, and robust target detection using 2D CA-CFAR.
