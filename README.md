@@ -55,9 +55,9 @@ The **Cell-Averaging Constant False Alarm Rate (CA-CFAR)** algorithm is applied 
 | **Doppler Guard Cells (one side)** | $\text{Gd}$ | 4 | Cells around the CUT that are excluded from noise estimation. |
 | **Threshold Offset ($\alpha$)** | $\text{offset}$ | 6 dB | The required Signal-to-Noise Ratio (SNR) margin for detection. |
 
-#### CFAR Core Logic:
+#### 2D CA-CFAR Core Logic
 
-The algorithm iterates through the RDM, defining an adaptive detection threshold ($T_h$) for each Cell Under Test ($\text{CUT}$) based on the local noise power ($\hat{P}_n$) estimated from the surrounding Training Cells.
+The algorithm iterates through the RDM, defining an adaptive detection threshold ($T_h$) for each Cell Under Test ($\text{CUT}$) based on the local noise power ($\hat{P}_n$) estimated from the surrounding Training Cells. 
 
 1.  **Noise Estimation:** The power of the Training Cells within the window is summed in the **linear** domain ($\text{db2pow}$).
 2.  **Exclusion:** The Guard Cells and CUT are explicitly set to zero power in the **linear** domain to prevent signal leakage from corrupting the noise average.
@@ -65,11 +65,13 @@ The algorithm iterates through the RDM, defining an adaptive detection threshold
     $$
     T_h = \text{pow2db} \left( \frac{\sum P_{\text{linear}}}{\text{Total Training Cells}} \right) + \text{offset}_{\text{dB}}
     $$
-4.  **Detection:** If the CUT power ($\text{RDM}_{\text{CUT}}$) is greater than $T_h$, the cell is marked as a target (`1`) in the output map ($\text{RDM\_cfar}$). 
+4.  **Detection:** If the CUT power ($\text{RDM}_{\text{CUT}}$) is greater than $T_h$, the cell is marked as a target (`1`) in the output map ($\text{RDM\_cfar}$).
 
-## 📈 Expected Output
+---
 
-The script generates plots for:
+## 📈 Expected Output Plots
+
+The script generates three plots to visualize the processing pipeline and final result:
 
 1.  **Range from First FFT:** Shows the range profile of the first chirp, clearly indicating the target range.
 2.  **Range Doppler Map (RDM):** A 3D surface plot showing the target's power peak at its correct range and velocity coordinates.
