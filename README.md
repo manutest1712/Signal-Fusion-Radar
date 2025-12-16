@@ -65,8 +65,10 @@ The algorithm iterates through the RDM, defining an adaptive detection threshold
 ```math
 T_h = \text{pow2db}\left( \frac{\sum P_{\text{linear}}}{N_{\text{tc}}} \right) + \text{offset}_{\text{dB}}
 ```
-4.  **Detection: The final step is to compare the power of the Cell Under Test (CUT) against the calculated adaptive threshold ($T_h$).
-5.  ** If the CUT power ($\text{RDM}_{\text{CUT}}$) is greater than $T_h$, the cell is marked as a target (`1`) in the output map ($\text{RDM}_{\text{cfar}}$).
+4.  **Detection**: The final step is to compare the power of the Cell Under Test (CUT) against the calculated adaptive threshold ($T_h$).
+* **Comparison Rule:** If the CUT power ($P_{\text{CUT}}$) from the Range-Doppler Map (RDM) is greater than the Threshold ($T_h$), the cell is declared a target.
+* **Output:** The cell is marked as a target (`1`) in the final CFAR output map ($M_{\text{CFAR}}$).
+6.  ** If the CUT power ($\text{RDM}_{\text{CUT}}$) is greater than $T_h$, the cell is marked as a target (`1`) in the output map ($\text{RDM}_{\text{cfar}}$).
 
 ---
 
