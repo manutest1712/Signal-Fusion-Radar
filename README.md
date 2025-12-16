@@ -82,5 +82,6 @@ The script generates three plots to visualize the processing pipeline and final 
 
 1.  **Range from First FFT:** Shows the range profile of the first chirp, clearly indicating the target range.
 2.  **Range Doppler Map (RDM):** A 3D surface plot showing the target's power peak at its correct range and velocity coordinates.
+   ![Range Doppler Map](docs/images/Range-Doppler-Map.png)
 3.  **CFAR Detection Map:** A binary map ($\text{RDM}_{\text{cfar}}$) where only the detected target cell(s) are set to 1, demonstrating the successful suppression of noise and clutter.
-    ![Architecture Diagram](docs/images/CA-CFAR-Map.png)
+    ![CA CFAR Map](docs/images/CA-CFAR-Map.png)
