@@ -29,7 +29,7 @@ The script is divided into four main sections:
 The script first calculates the necessary FMCW parameters based on the specifications:
 
 * **Bandwidth ($B_{sweep}$):** Determined by the required Range Resolution. $B_{sweep} = \frac{c}{2 \cdot \Delta R} = 150 \text{ MHz}$.
-* **Chirp Time ($T_{chirp}$):** Calculated based on the maximum range to ensure the beat frequency falls within the processing window.
+* **Chirp Time ($T_{chirp}$):** Calculated based on the maximum range to ensure the beat frequency falls within the processing window. $$T_{chirp} = \frac{5.5 \times 2 \times R_{max}}{c}$$
 * **Slope ($S$):** $S = B_{sweep} / T_{chirp}$.
 
 ### 2. Signal Generation and Moving Target Simulation
