@@ -62,9 +62,9 @@ The algorithm iterates through the RDM, defining an adaptive detection threshold
 2.  **Exclusion:** The Guard Cells and CUT are explicitly set to zero power in the **linear** domain to prevent signal leakage from corrupting the noise average.
 3.  **Threshold Calculation:** The average linear noise power is converted back to decibels (dB) using `pow2db`, and a fixed SNR offset is added to form the adaptive threshold:
 
-\[
-T_h = \text{pow2db}\left( \frac{\sum P_{\text{linear}}}{\text{Total Training Cells}} \right) + \text{offset}_{\text{dB}}
-\]
+```math
+T_h = \text{pow2db}\left( \frac{\sum P_{\text{linear}}}{N_{\text{tc}}} \right) + \text{offset}_{\text{dB}}
+```
 4.  **Detection:** If the CUT power ($\text{RDM}_{\text{CUT}}$) is greater than $T_h$, the cell is marked as a target (`1`) in the output map ($\text{RDM}_{\text{cfar}}$).
 
 ---
